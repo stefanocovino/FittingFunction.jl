@@ -7,7 +7,7 @@ export SBPL
 
 
 """
-    PL(E,N,β;E₀ = 1.)
+    PL(E,N,B;E0=1.)
 
 Computes a power-law with spectral index 'β' and normalization 'N' at input 'E'. You can normalize the power-law at 'E₀'.
 
@@ -21,8 +21,8 @@ PL(3.,1.,-1.)
 0.3333333333333333
 ```
 """
-function PL(E,N,β;E₀ = 1.)
-    spec = .^(E./E₀,β)
+function PL(E,N,B; E0=1.)
+    spec = .^(E./E0,B)
     return N .* spec
 end
 
@@ -31,9 +31,9 @@ end
 
 
 """
-    SBPL(E,N,α₁,α₂,bE)
+    SBPL(E,N,A1,A2,Eb)
 
-Computes a smoothly joint broken power-law with spectral index '$\alpha_1$' and '$\alpha_2$', a break at 'Eb' and normalization 'N' at input 'E'.
+Computes a smoothly joint broken power-law with spectral index 'A1' and 'A2', a break at 'Eb' and normalization 'N' at input 'E'.
 
 
 # Examples
@@ -45,10 +45,10 @@ SBPL(6.,1.,-1.,1.5,5.)
 0.26290682760247974
 ```
 ""
-function SBPL(E,N,α₁,α₂,Eb)
-    f1 = PL(E,N,α₁)
-    n = PL(Eb,N,α₁) ./ PL(Eb,1.0,α₂)
-    f2 = PL(E,n,α₂)
+function SBPL(E,N,A1,A2,Eb)
+    f1 = PL(E,N,A1)
+    n = PL(Eb,N,A1) ./ PL(Eb,1.0,A2)
+    f2 = PL(E,n,A2)
     return ifelse.(E .<= Eb, f1, f2)
 end
 
