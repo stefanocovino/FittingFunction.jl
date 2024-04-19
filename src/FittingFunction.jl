@@ -44,7 +44,7 @@ SBPL(6.,1.,-1.,1.5,5.)
 
 0.26290682760247974
 ```
-""
+"""
 function SBPL(E,N,A1,A2,Eb)
     f1 = PL(E,N,A1)
     n = PL(Eb,N,A1) ./ PL(Eb,1.0,A2)
