@@ -38,11 +38,11 @@ Computes a smoothly joint broken power-law with spectral index 'A1' and 'A2', a 
 
 # Examples
 ```jldoctest
-SBPL(6.,1.,-1.,1.5,5.)
+SBPL(6.,1.,-1.,-1.5,5.)
 
 # output
 
-0.26290682760247974
+0.15214515486254615
 ```
 """
 function SBPL(E,N,A1,A2,Eb)
