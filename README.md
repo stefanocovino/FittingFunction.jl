@@ -5,6 +5,10 @@
 [![Build Status](https://github.com/stefanocovino/FittingFunction.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/stefanocovino/FittingFunction.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
 
+This is a simple package including several julia functions useful to carry out regressions.
+
+
+
 ## Installation
 
 ```julia
