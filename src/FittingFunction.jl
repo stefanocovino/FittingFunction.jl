@@ -42,17 +42,14 @@ FFGals = Dict("MW" => 3.12, "SMC" => 2.74, "LMC" => 3.41, "Any" => 4.0)
 """
     Extinction(wave,EBV;gal="SMC",Rv=FFGals["SMC"],z=0.)
 
-Compute the UV/optical/extinction at the input wavelength 'wave', in Angstrom. 'EBV' is E(B-V) in magnitudes, 'gal' is one of the galaxy extinction recipes listed in the 'FFGals' (exported) dictionary shown below. 'Rv' is the seelctive extinction and 'z' is the redshift of the absorpber. References about the adopted extinction curves are discussed in the documentation of the [DustExtinction](https://juliaastro.org/DustExtinction.jl/stable/) package.
+Compute the UV/optical/extinction at the input wavelength 'wave', in Angstrom. 'EBV' is E(B-V) in magnitudes, 'gal' is one of the galaxy extinction recipes listed in the 'FFGals' (exported) dictionary. 'Rv' is the seelctive extinction and 'z' is the redshift of the absorpber. References about the adopted extinction curves are discussed in the documentation of the [DustExtinction](https://juliaastro.org/DustExtinction.jl/stable/) package.
 
 
 # Examples
 
-```
-@show FFGals
-```
 
 ```
-Extinction(5500.,1;gal="MW",Rv=FFGals["MW"],z=0.)
+Extinction(5500.,1,gal="MW",Rv=FFGals["MW"],z=0.)
 
 # output
 
