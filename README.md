@@ -19,4 +19,4 @@ Pkg.add(url="https://github.com/stefanocovino/FittingFunction.jl.git")
 will install this package.
 
 
-[Here](https://stefanocovino.github.io/FittingFunction.jl)'s the documentation!
+[Here](https://stefanocovino.github.io/FittingFunction.jl/stable)'s the documentation!

@@ -20,7 +20,8 @@ Compute the so-called 'Band function', at input energy 'E'. 'α' is the low-ener
 
 # Examples
 
-```
+
+```jldoctest
 Band(300.,-2.,-1.,200.,1.)
 
 # output
@@ -48,7 +49,7 @@ Compute the UV/optical/extinction at the input wavelength 'wave', in Angstrom. '
 # Examples
 
 
-```
+```jldoctest
 Extinction(5500.,1,gal="MW",Rv=FFGals["MW"],z=0.)
 
 # output
