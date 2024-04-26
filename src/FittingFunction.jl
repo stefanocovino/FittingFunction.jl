@@ -103,7 +103,7 @@ end
 """
     SBPL(E,N,α,β,Eb)
 
-Computes a smoothly joint broken power-law with spectral index 'α' and 'β', a break at 'Eb' and normalization 'N' at input 'E'.
+Computes a smoothly joint broken power-law with spectral index 'α' and 'β', a break at 'Eb', normalization 'N' and input energy'E'.
 
 
 # Examples
@@ -121,6 +121,37 @@ function SBPL(E,N,α,β,Eb)
     f2 = PL(E,n,β)
     return ifelse.(E .<= Eb, f1, f2)
 end
+
+
+
+"""
+    SBPL2(E,N,α,β,γ,Eb1,Eb2)
+
+Computes a smoothly joint double broken power-law with spectral index 'α', 'β' and 'γ', and two breaks at 'Eb1' and 'Eb2'. The normalization is 'N' and the input energy 'E'.
+
+
+# Examples
+```jldoctest
+SBPL2([4.,6.,8.],1.,-1.,-1.5,-2.,5.,7.)
+
+# output
+
+3-element Vector{Float64}:
+ 0.25
+ 0.06804138174397717
+ 0.04133986423538423
+```
+"""
+function SBPL2(E,N,α,β,γ,Eb1,Eb2)
+    f1 = PL(E,N,α)
+    n12 = PL(Eb1,N,α) ./ PL(Eb1,1.0,α)
+    f2 = PL(E,n12,β)
+    n23 = PL(Eb2,n12,β) ./ PL(Eb2,1.0,γ)
+    f3 = PL(E,n23,γ)
+    return ifelse.(E .<= Eb1, f1, ifelse.(E .<= Eb2, f2, f3))
+end
+
+
 
 
 
