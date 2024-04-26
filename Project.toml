@@ -1,7 +1,7 @@
 name = "FittingFunction"
 uuid = "7c8a6357-aefd-4570-aae0-a8cd991d38f9"
 authors = ["Stefano Covino <stefano.covino@inaf.it> and contributors"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 DustExtinction = "fb44c06c-c62f-5397-83f5-69249e0a3c8e"

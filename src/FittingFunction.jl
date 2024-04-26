@@ -9,6 +9,7 @@ export Extinction
 export FFGals
 export PL
 export SBPL
+export SBPL2
 export XAbs
 
 
