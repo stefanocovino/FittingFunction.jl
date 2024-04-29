@@ -5,6 +5,7 @@ using DustExtinction
 
 
 export Band
+export CPL
 export Extinction
 export FFGals
 export PL
