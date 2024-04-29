@@ -38,6 +38,27 @@ end
 
 
 
+"""
+    CPL(E,N,α,Ec;E0=1.)
+
+Computes a power-law with spectral index 'α' and normalization 'N' at input 'E'. You can normalize the power-law at 'E₀'.
+
+
+# Examples
+```jldoctest
+CPL(3.,1.,-1.,2.)
+
+# output
+
+0.6693904804452895
+```
+"""
+function CPL(E,N,α,Ec; E0=1.)
+    return N .* .^(E./E0,α) .* exp.(-E ./ Ec)
+end
+
+
+
 
 
 FFGals = Dict("MW" => 3.12, "SMC" => 2.74, "LMC" => 3.41, "Any" => 4.0)
