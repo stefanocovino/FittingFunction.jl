@@ -42,7 +42,7 @@ end
 """
     CPL(E,N,α,Ec;E0=1.)
 
-Computes a power-law with spectral index 'α' and normalization 'N' at input 'E'. You can normalize the power-law at 'E₀'.
+Computes a cut-off power-law with spectral index 'α' and normalization 'N' at input 'E' and cut-off energy 'Ec'. You can normalize the power-law at 'E0'.
 
 
 # Examples
@@ -100,9 +100,31 @@ end
 
 
 """
+    Gaussian(E,A,σ,El)
+
+Computes a Gaussian at energy 'E' with center in 'El' and width (FWHM/2.35) 'σ'. 'A is the normalization.
+
+
+# Examples
+```jldoctest
+Gaussian(3.,1.,0.1,2.)
+
+# output
+
+4.009419869036418
+```
+"""
+function Gaussian(E,A,σ,El)
+    return A .* (1/sqrt(2*pi)) * (1 ./ σ) .* exp.((E .- El).^2 ./ 2*σ.^2)
+end
+
+
+
+
+"""
     PL(E,N,α;E0=1.)
 
-Computes a power-law with spectral index 'α' and normalization 'N' at input 'E'. You can normalize the power-law at 'E₀'.
+Computes a power-law with spectral index 'α' and normalization 'N' at input 'E'. You can normalize the power-law at 'E0'.
 
 
 # Examples

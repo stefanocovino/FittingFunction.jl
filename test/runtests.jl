@@ -3,10 +3,8 @@ using Test
 
 @testset "FittingFunction.jl" begin
     # Write your tests here.
-    # PL
     @test PL(3.,1.,-1.) == 0.3333333333333333
     #
-    # SBPL
     @test SBPL(3.,1.,-1.,-1.5,5.) == 0.3333333333333333
     @test SBPL(6.,1.,-1.,-1.5,5.) == 0.15214515486254615
     #
@@ -20,4 +18,5 @@ using Test
     #
     @test CPL(3.,1.,-1.,2.) == 0.0743767200494766
     #
+    @test Gaussian(3.,1.,0.1,2.) == 4.009419869036418
 end
