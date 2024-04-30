@@ -8,6 +8,7 @@ export Band
 export CPL
 export Extinction
 export FFGals
+export GaussAbs
 export Gaussian
 export PL
 export SBPL
@@ -96,6 +97,31 @@ function Extinction(wave,EBV;gal="SMC",Rv=FFGals["SMC"],z=0.)
     #
     return absr
 end
+
+
+
+
+"""
+    GaussAbs(E,Ed,σ,El)
+
+Computes a Gaussian absorption with depth 'Ed' at energy 'E' with center in 'El' and width (FWHM/2.35) 'σ'. 'A.
+
+
+# Examples
+```jldoctest
+GaussAbs(2.,1.,0.1,2.)
+
+# output
+
+0.018510395162776326
+```
+"""
+function GaussAbs(E,Ed,σ,El)
+    return exp.(-(Ed / sqrt(2*pi)) .* (1 ./ σ) .* exp.((E .- El).^2 ./ 2*σ.^2))
+end
+
+
+
 
 
 
