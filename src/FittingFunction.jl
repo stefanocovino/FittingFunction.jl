@@ -102,7 +102,7 @@ end
 
 
 """
-    GaussAbs(E,D,σ,El)
+    GaussAbs(E,Ed,σ,El)
 
 Computes a Gaussian absorption with depth 'Ed' at energy 'E' with center in 'El' and width (FWHM/2.35) 'σ'. 'A.
 
