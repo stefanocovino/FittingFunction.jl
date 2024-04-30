@@ -8,6 +8,7 @@ export Band
 export CPL
 export Extinction
 export FFGals
+export Gaussian
 export PL
 export SBPL
 export SBPL2
