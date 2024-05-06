@@ -6,10 +6,12 @@ using DustExtinction
 
 export Band
 export CPL
+export Counts2Mag
 export Extinction
 export FFGals
 export GaussAbs
 export Gaussian
+export Mag2Counts
 export PL
 export SBPL
 export SBPL2
@@ -62,6 +64,30 @@ end
 
 
 
+"""
+    Counts2Mag(cts,ects;zp=25.0,ezp=0.0)
+
+Convert counts (or flux) 'cts', with uncertainty 'ects', to magnitude scale with zero-point 'zp' and relative uncertainty.
+
+
+# Examples
+```jldoctest
+Counts2Mag(100,10)
+
+# output
+
+(20.0, 0.10857362047581294)
+```
+"""
+function Counts2Mag(cts,ects;zp=25.0,ezp=0.)
+    mag = -2.5 .* log10.(cts) .+ zp
+    emag = (2.5 ./ log(10)) .* (ects ./ cts)
+    emag = sqrt.(emag .^2 .+ ezp .^ 2)
+    return mag, emag
+end
+
+
+
 
 
 FFGals = Dict("MW" => 3.12, "SMC" => 2.74, "LMC" => 3.41, "Any" => 4.0)
@@ -97,6 +123,8 @@ function Extinction(wave,EBV;gal="SMC",Rv=FFGals["SMC"],z=0.)
     #
     return absr
 end
+
+
 
 
 
@@ -145,6 +173,28 @@ function Gaussian(E,A,σ,El)
     return A .* (1/sqrt(2*pi)) * (1 ./ σ) .* exp.((E .- El).^2 ./ 2*σ.^2)
 end
 
+
+
+"""
+    Mag2Counts(mag,emag;zp=25.0)
+
+Convert magnitudes 'mag' with uncertainty 'emag' to counts (or flux) with zero-point 'zp'.
+
+
+# Examples
+```jldoctest
+Mag2Counts(20,0.1)
+
+# output
+
+(100.0, 9.210340371976184)
+```
+"""
+function Mag2Counts(mag, emag; zp=25.0)
+    cts = 10 .^ (-0.4 .* (mag .- zp))
+    ects = (emag .* cts) ./ (2.5 ./ log(10.0))
+    return cts, ects
+end
 
 
 
