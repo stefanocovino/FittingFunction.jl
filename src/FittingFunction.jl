@@ -8,6 +8,7 @@ export Band
 export CPL
 export Counts2Mag
 export Extinction
+export FindRebinSchema
 export FFGals
 export GaussAbs
 export Gaussian
@@ -124,6 +125,46 @@ function Extinction(wave,EBV;gal="SMC",Rv=FFGals["SMC"],z=0.)
     return absr
 end
 
+
+
+"""
+    FindRebinSchema(x,ey;minSN=5)::AbstractVector{Real}
+
+Compute the rebin schema to guarantee that the S/N is at least 'minSN' in each bin (or channel). 'x' and 'ex' are the input data and relative uncertainties.
+
+# Examples
+```jldoctest
+
+x = [1.,2.,3.,4.,]
+ex = [0.1,0.5,0.6,0.05]
+
+FindRebinSchema(x,ex)
+
+# output
+
+3-element Vector{Any}:
+ 1
+ 3
+ 4
+
+```
+"""
+function FindRebinSchema(x::AbstractVector{Float64},ex::AbstractVector{Float64};minSN=5)::AbstractVector{Real}
+    sbin = []
+    i = 1
+    while i <= length(x)
+        for l in i:length(x)
+            c = sum(x[i:l])
+            b = sqrt(sum(ex[i:l].^2))
+            if abs(c)/b >= minSN || l == length(x)
+                push!(sbin,l)
+                i = l+1
+                break
+            end
+        end
+    end
+    return sbin
+end
 
 
 
