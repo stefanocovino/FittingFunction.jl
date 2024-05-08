@@ -142,8 +142,7 @@ FindRebinSchema(x,ex)
 
 # output
 
-3-element Vector{Any}:
- vector{Real}:
+3-element Vector{Real}:
  1
  3
  4
