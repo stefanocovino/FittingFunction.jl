@@ -14,8 +14,10 @@ export GaussAbs
 export Gaussian
 export Mag2Counts
 export PL
+export Pol2Stokes
 export SBPL
 export SBPL2
+export Stokes2Pol
 export XAbs
 
 
@@ -264,6 +266,38 @@ end
 
 
 """
+    Pol2Stokes(i, p, t, c; ep=0.0, et=0.0, ec=0.0)
+
+Computes the Stokes parameters for a given polarisation degree and position angle. 'i' is total intensity, 'p' the polarisation degree, 't' the position angle (randians) and 'c' the circular polarisation. The errors 'ep', 'ew, and 'e' are optional.
+The ouput is: intensity 'q', 'u', 'v' Stokes parameters and respective errors.
+
+
+# Examples
+```jldoctest
+Pol2Stokes(1.,0.1,0.1,0.)
+
+# output
+
+(1.0, 0.09800665778412417, 0.019866933079506124, 0.0, 0.0, 0.0, 0.0)
+```
+"""
+function Pol2Stokes(i, p, t, c; ep=0.0, et=0.0, ec=0.0)
+    q = p.*i.*cos.(2 .*t).*cos.(2 .*c)
+    u = p.*i.*sin.(2 .*t).*cos.(2 .*c)
+    v = p.*i.*sin.(2 .*c)
+    #
+    eq = sqrt.((q.*ep./p).^2 .+ (2 .*u.*et).^2 .+ (2 .*v.*cos.(2 .*t).*ec).^2)
+    eu = sqrt.((u.*ep./p).^2 .+ (2 .*q.*et).^2 .+ (2 .*v.*sin.(2 .*t).*ec).^2)
+    ev = sqrt.((v.*ep./p).^2 .+ (2 .*i.*p.*ec.*cos.(2 .*c)).^2)
+    return i, q, u, v, eq, eu, ev
+end
+
+
+
+
+
+
+"""
     SBPL(E,N,α,β,Eb)
 
 Computes a smoothly joint broken power-law with spectral index 'α' and 'β', a break at 'Eb', normalization 'N' and input energy'E'.
@@ -313,6 +347,38 @@ function SBPL2(E,N,α,β,γ,Eb1,Eb2)
     f3 = PL(E,n23,γ)
     return ifelse.(E .<= Eb1, f1, ifelse.(E .<= Eb2, f2, f3))
 end
+
+
+
+"""
+    Stokes2Pol(i, q, u, v; eq=0.0, eu=0.0, ev=0.0)
+
+Computes the polarisation degree and position angle given the Stokes parameters: 'i', total intensity, and 'q', 'u' and 'v'. The errors 'eq', 'eu, and 'ev' are optional.
+The ouput is: intensity 'i', polarisation degree, 'p', position angle (randians) 'theta' and circular polarisation 'chi', with respective errors.
+
+
+# Examples
+```jldoctest
+Stokes2Pol(1.,0.1,0.1,0.)
+
+# output
+
+(1.0, 0.14142135623730953, 0.39269908169872414, 0.0, 0.0, 0.0, 0.0)
+```
+"""
+function Stokes2Pol(i, q, u, v; eq=0.0, eu=0.0, ev=0.0)
+    pl = sqrt.(q.^2 .+ u.^2) ./ i
+    pol = sqrt.(q.^2 .+ u.^2 .+ v.^2) ./ i
+    theta = 0.5 .* atan.(u,q)
+    chi = 0.5 .* atan.(v, pl)
+    #
+    epl = sqrt.((q.*eq).^2 .+ (u.*eu).^2)./pl
+    epol = sqrt.((q.*eq).^2 .+ (u.*eu).^2 .+ (v.*ev).^2)./pol
+    etheta = 0.5.*sqrt.((u.*eq).^2 .+ (q.*eu).^2)./(pl.^2)
+    echi = 0.5.*sqrt.((v.*epl).^2 .+ (pl.*ev).^2)./(pol.^2)
+    return i, pol, theta, chi, epol, etheta, echi
+end
+
 
 
 
