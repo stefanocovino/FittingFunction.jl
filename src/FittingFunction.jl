@@ -1,5 +1,7 @@
 module FittingFunction
 
+using CSV
+using DataFrames
 using DustExtinction
 using PhysicalConstants.CODATA2018
 using Unitful
@@ -14,6 +16,7 @@ export Extinction
 export FFGals
 export GaussAbs
 export Gaussian
+export GetAtomicData
 export Mag2Counts
 export PL
 export Pol2Stokes
@@ -181,6 +184,42 @@ end
 
 
 
+
+
+AvailableAtomicTables = ["FitLyman","JitrikBunge04","VALD03"]
+
+"""
+    GetAtomicData(table::String="")::DataFrame
+
+Provides a table with atomic data among those available. Calling the function with no parameter shows the available tables.
+
+
+# Examples
+```julia
+fly = GetAtomicData("FitLyman")
+```
+"""
+function GetAtomicData(table::String="")::DataFrame
+    if table == ""
+      for t in AvailableAtomicTables
+        println("Available atomic data tables:")
+        println("\t"*t)
+      end
+      return DataFrame()
+    elseif table in AvailableAtomicTables
+      tb = DataFrame(CSV.File(joinpath(pkgdir(FittingFunction),"data",table*".csv")))
+      return tb
+    else
+      println("Warning! Table not recognized.")
+      return DataFrame()
+    end
+end
+
+
+
+
+
+
 """
     Mag2Counts(mag,emag;zp=25.0)
 
@@ -223,6 +262,7 @@ function PL(E,N,α; E0=1.)
     spec = .^(E./E0,α)
     return N .* spec
 end
+
 
 
 
@@ -353,7 +393,7 @@ ee = ustrip(ElementaryCharge)/3.3356e−10;
 """
     TauVoigt(λ,NHI,DopplerBroadening,z,transition)
 
-Computes the opacity due to a given absorption transition. ``\\lambda`` are the wavelenghths (``cm``), ``N`` the column density (``cm^{-2}``), 'DopplerBroadening' is expressed in (``cm~s^{-1}``), 'z' is the source redshift and 'transition' is a tuple formed by the central wawelength (``cm``), the oscillator strength and the damping coefficient (``s^{-1}``) for the given transition.
+Computes the opacity due to a given absorption transition. ``\\lambda`` are the wavelenghths (``cm``), ``N`` the column density (``cm^{-2}``), 'DopplerBroadening' is expressed in (``cm~s^{-1}``), 'z' is the source redshift and 'transition' is a tuple formed by the central wawelength (``cm``), the oscillator strength and the damping coefficient (``s^{-1}``) for the given transition. The Doppler broadening factor is typicaly due to either an intrinsic thermal broadening (``b_K = \\sqrt{2KT/m}``) or to a turbulent motion of the gas (``b_T = \\sqrt{\\sigma_T}``, where ``\\sigma_T`` is the inner velocity dispersion). These two factors can be summed in quadrature, i.e. ``b = \\sqrt{b_K^2 + b_T^2}``.
 
 
 # Examples
@@ -397,7 +437,7 @@ end
     VoigtFuncTG(a,v)
 
 Approximates the Voigt (or line broadening function) function. It was introduced by [Tepper-Garcia (2006)](https://ui.adsabs.harvard.edu/abs/2006MNRAS.369.2025T/abstract). It is of [high accuracy](https://en.wikipedia.org/wiki/Voigt_profile) provided that ``a \\le 10^{-4}``. The ``a`` and ``v`` parameters are defined as:
-``a = \\frac{\\Gamma \\lambda_c}{4\\pi b 10^{13}}`` and ``v = \\frac{(\\lambda_c - \\lambda)c}{b \\lambda_c \\sqrt{2 \\log 2}}``, where ``\\lambda_c`` is the central wavelength of the transition, ``c`` the speed of light and ``b`` the Doppler broadening factor.
+``a = \\frac{\\Gamma \\lambda_c}{4\\pi b 10^{13}}`` and ``v = \\frac{(\\lambda_c - \\lambda)c}{b \\lambda_c \\sqrt{2 \\log 2}}``, where ``\\lambda_c`` is the central wavelength of the transition, ``c`` the speed of light, ``b`` the Doppler broadening factor and ``\\Gamma`` the damping coefficient.
 
 
 # Examples

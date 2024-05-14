@@ -1,5 +1,7 @@
+using DataFrames
 using FittingFunction
 using Test
+
 
 @testset "FittingFunction.jl" begin
     # Write your tests here.
@@ -33,5 +35,7 @@ using Test
     @test FittingFunction.VoigtFunctTG(1e-5,1.) == 0.36788094737611143
     #
     @test TauVoigt(1494.5 .* 1e-8,1e18,1e5,0.,[1495.05*1e-8,0.54,8.106e8]) == 0.5408331361420329
+    #
+    @test typeof(GetAtomicData()) == typeof(DataFrame())
     #
 end
