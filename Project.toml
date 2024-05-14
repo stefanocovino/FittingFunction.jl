@@ -1,10 +1,12 @@
 name = "FittingFunction"
 uuid = "7c8a6357-aefd-4570-aae0-a8cd991d38f9"
 authors = ["Stefano Covino <stefano.covino@inaf.it> and contributors"]
-version = "0.8.0"
+version = "0.9.0"
 
 [deps]
 DustExtinction = "fb44c06c-c62f-5397-83f5-69249e0a3c8e"
+PhysicalConstants = "5ad8b20f-a522-5ce9-bfc9-ddf1d5bda6ab"
+Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
 DustExtinction = "0.11"

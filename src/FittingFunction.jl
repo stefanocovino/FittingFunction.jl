@@ -1,6 +1,9 @@
 module FittingFunction
 
 using DustExtinction
+using PhysicalConstants.CODATA2018
+using Unitful
+
 
 
 
@@ -8,7 +11,6 @@ export Band
 export CPL
 export Counts2Mag
 export Extinction
-export FindRebinSchema
 export FFGals
 export GaussAbs
 export Gaussian
@@ -18,6 +20,7 @@ export Pol2Stokes
 export SBPL
 export SBPL2
 export Stokes2Pol
+export TauVoigt
 export XAbs
 
 
@@ -127,46 +130,6 @@ function Extinction(wave,EBV;gal="SMC",Rv=FFGals["SMC"],z=0.)
     return absr
 end
 
-
-
-"""
-    FindRebinSchema(x,ey;minSN=5)::AbstractVector{Real}
-
-Compute the rebin schema to guarantee that the S/N is at least 'minSN' in each bin (or channel). 'x' and 'ex' are the input data and relative uncertainties.
-
-# Examples
-```jldoctest
-
-x = [1.,2.,3.,4.,]
-ex = [0.1,0.5,0.6,0.05]
-
-FindRebinSchema(x,ex)
-
-# output
-
-3-element Vector{Real}:
- 1
- 3
- 4
-
-```
-"""
-function FindRebinSchema(x::AbstractVector{Float64},ex::AbstractVector{Float64};minSN=5)::AbstractVector{Real}
-    sbin = []
-    i = 1
-    while i <= length(x)
-        for l in i:length(x)
-            c = sum(x[i:l])
-            b = sqrt(sum(ex[i:l].^2))
-            if abs(c)/b >= minSN || l == length(x)
-                push!(sbin,l)
-                i = l+1
-                break
-            end
-        end
-    end
-    return sbin
-end
 
 
 
@@ -382,6 +345,84 @@ end
 
 
 
+c0 = ustrip(uconvert(u"cm"*u"s^-1",SpeedOfLightInVacuum))
+em = ustrip(uconvert(u"g",ElectronMass))
+ee = ustrip(ElementaryCharge)/3.3356e−10;
+
+
+"""
+    TauVoigt(λ,NHI,DopplerBroadening,z,transition)
+
+Computes the opacity due to a given absorption transition. ``\\lambda`` are the wavelenghths (``cm``), ``N`` the column density (``cm^{-2}``), 'DopplerBroadening' is expressed in (``cm~s^{-1}``), 'z' is the source redshift and 'transition' is a tuple formed by the central wawelength (``cm``), the oscillator strength and the damping coefficient (``s^{-1}``) for the given transition.
+
+
+# Examples
+```jldoctest
+TauVoigt(range(start=1494.5,stop=1495.5,step=0.1) .* 1e-8,1e18,1e5,0.,[1495.05*1e-8,0.54,8.106e8])
+
+# output
+
+11-element Vector{Float64}:
+  0.5408331361420329
+  0.8079604230648749
+  1.3357686994197793
+  2.618871809580839
+  7.282358478732964
+ 66.40911467182524
+ 66.40911467182524
+  7.282358478732964
+  2.618871809580839
+  1.3357686994184856
+  0.8079604230648749
+```
+"""
+function TauVoigt(λ,N,DopplerBroadening,z,transition)
+    LambdCentr, OscillStrength, DampCoeff = transition
+    #
+    coeffNum = 4 * sqrt(pi^3) * ee^2
+    coeffDem = em * c0
+    a = (LambdCentr * DampCoeff) / (4 * pi * DopplerBroadening)
+    fact = a * (coeffNum/coeffDem) * (OscillStrength/DampCoeff)
+    v = c0 * (LambdCentr .- λ ./ (1 .+ z)) / (LambdCentr * DopplerBroadening)
+    #
+    res = VoigtFunctTG(a,v)
+    #
+    return N .* res .* fact
+end
+
+
+
+
+"""
+    VoigtFuncTG(a,v)
+
+Approximates the Voigt (or line broadening function) function. It was introduced by [Tepper-Garcia (2006)](https://ui.adsabs.harvard.edu/abs/2006MNRAS.369.2025T/abstract). It is of [high accuracy](https://en.wikipedia.org/wiki/Voigt_profile) provided that ``a \\le 10^{-4}``. The ``a`` and ``v`` parameters are defined as:
+``a = \\frac{\\Gamma \\lambda_c}{4\\pi b 10^{13}}`` and ``v = \\frac{(\\lambda_c - \\lambda)c}{b \\lambda_c \\sqrt{2 \\log 2}}``, where ``\\lambda_c`` is the central wavelength of the transition, ``c`` the speed of light and ``b`` the Doppler broadening factor.
+
+
+# Examples
+```jldoctest
+FittingFunction.VoigtFunctTG(1e-5,1.)
+
+# output
+
+0.36788094737611143
+```
+"""
+function VoigtFunctTG(a,v)
+    F = v.^2
+    H0 = exp.(-F)
+    Q = 1.5 ./ F
+    res1 = H0
+    res2 = a ./ (pi.^0.5 .* F)
+    res3 = H0.^2 .* (4 .* F.^2 .+ 7 .* F .+ 4 .+ Q) .- Q .- 1
+    return res1 .- res2 .* res3
+end
+
+
+
+
+
 
 
 function XAbsorption(E; NH=1e20, z=0)
@@ -476,7 +517,7 @@ XAbs([0.5,1.25,2.], NH=1e20, z=0)
 ```
 """
 function XAbs(E; NH=1e20, z=0)
-    return map(e -> XAbsorption(e, NH=NH, z=z), E)
+    return map(e -> FittingFunction.XAbsorption(e, NH=NH, z=z), E)
 end
 
 
