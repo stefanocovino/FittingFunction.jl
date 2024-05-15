@@ -4,6 +4,7 @@ using CSV
 using DataFrames
 using DustExtinction
 using PhysicalConstants.CODATA2018
+using StatsBase
 using Unitful
 
 
@@ -22,6 +23,7 @@ export PL
 export Pol2Stokes
 export SBPL
 export SBPL2
+export SigmaClip
 export Stokes2Pol
 export TauVoigt
 export XAbs
@@ -355,6 +357,43 @@ function SBPL2(E,N,α,β,γ,Eb1,Eb2)
     f3 = PL(E,n23,γ)
     return ifelse.(E .<= Eb1, f1, ifelse.(E .<= Eb2, f2, f3))
 end
+
+
+
+
+
+"""
+    SigmaClip(x, ex=ones(size(x)); sigmacutlevel=2)
+
+Filters an input array 'x' with optional uncertainties 'ex' with one-iteration sigma clipping at the level 'sigmacutlevel'. It reports a mask to select the surviving elements in the input arrays or other relwted arrays.
+
+# Examples
+```jldoctest
+x = [4.,6.,8.,1.,3.,5.,20.]
+mask = SigmaClip(x)
+x[mask]
+
+# output
+
+6-element Vector{Float64}:
+ 4.0
+ 6.0
+ 8.0
+ 1.0
+ 3.0
+ 5.0
+```
+"""
+function SigmaClip(x, ex=ones(size(x)); sigmacutlevel=2)
+    w = pweights(1 ./ ex.^2)
+    m = mean(x,w)
+    s = std(x,w)
+    #println(m," ",s)
+    #
+    flt = (m-sigmacutlevel*s .<= x) .& (x .<= m+sigmacutlevel*s)
+    return flt
+end
+
 
 
 

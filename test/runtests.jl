@@ -38,4 +38,8 @@ using Test
     #
     @test typeof(GetAtomicData()) == typeof(DataFrame())
     #
+    x = [4.,6.,8.,1.,3.,5.,20.]
+    mask = SigmaClip(x)
+    @test x[mask] == [4.,6.,8.,1.,3.,5.]
+    #
 end
