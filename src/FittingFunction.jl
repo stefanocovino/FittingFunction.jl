@@ -186,12 +186,17 @@ end
 
 
 
-AvailableAtomicTables = ["FitLyman","JitrikBunge04","VALD03"]
+AvailableAtomicTables = ["FitLyman","JitrikBunge04","VALD3"]
 
 """
     GetAtomicData(table::String="")::DataFrame
 
-Provides a table with atomic data among those available. Calling the function with no parameter shows the available tables.
+Provides a table with atomic data among those available. Calling the function with no parameter shows the available tables. At present we have:
+
+* "FitLyman". This is the original table generated for the ["FitLyman" ESO-MIDAS](https://ui.adsabs.harvard.edu/abs/1995Msngr..80...37F/abstract) package.
+* "JitrikBunge04". This is a collection of atomic data prepared by [Jitrik & Bunge (2004)](https://ui.adsabs.harvard.edu/abs/2004JPCRD..33.1059J/abstract).
+* "VALD03". This is a collection of atomic data extracted from the [VALD3](http://vald.astro.uu.se/) database.
+
 
 
 # Examples

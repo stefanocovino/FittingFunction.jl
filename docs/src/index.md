@@ -9,6 +9,13 @@ Documentation for [FittingFunction](https://github.com/stefanocovino/FittingFunc
 A set of functions I am often using in carrying out regressions.
 
 
+
+
+```@contents
+```
+
+
+
 ```@index
 ```
 
