@@ -509,12 +509,25 @@ end
 """
     Stokes2Pol(i, q, u, v; eq=0.0, eu=0.0, ev=0.0)
 
-Computes the polarisation degree and position angle given the Stokes parameters: 'i', total intensity, and 'q', 'u' and 'v'. The errors 'eq', 'eu, and 'ev' are optional.
-The ouput is: intensity 'i', polarisation degree, 'p', position angle (randians) 'theta' and circular polarisation 'chi', with respective errors.
+Compute the polarisation degree and position angle from the Stokes parameters.
+
+# Arguments
+
+- `i` total intensity.
+- `q` verical/horizontal polarization.
+- `u` oblique polarization.
+- `v` circular polarisation.
+- `eq` uncertainty on the `q` parameter.
+- `eu` uncertainty on the `u` parameter.
+- `ev` uncertainty on the `v` parameter.
+ 
+The ouput is given by the intensity `i`, polarisation degree, `p`, position angle 
+(randians) `theta` and circular polarisation `chi`, with respective errors.
 
 
 # Examples
 ```jldoctest
+
 Stokes2Pol(1.,0.1,0.1,0.)
 
 # output
@@ -546,11 +559,26 @@ ee = ustrip(ElementaryCharge)/3.3356e−10;
 """
     TauVoigt(λ,NHI,DopplerBroadening,z,transition)
 
-Computes the opacity due to a given absorption transition. ``\\lambda`` are the wavelenghths (``cm``), ``N`` the column density (``cm^{-2}``), 'DopplerBroadening' is expressed in (``cm~s^{-1}``), 'z' is the source redshift and 'transition' is a tuple formed by the central wawelength (``cm``), the oscillator strength and the damping coefficient (``s^{-1}``) for the given transition. The Doppler broadening factor is typicaly due to either an intrinsic thermal broadening (``b_K = \\sqrt{2KT/m}``) or to a turbulent motion of the gas (``b_T = \\sqrt{\\sigma_T}``, where ``\\sigma_T`` is the inner velocity dispersion). These two factors can be summed in quadrature, i.e. ``b = \\sqrt{b_K^2 + b_T^2}``.
+Compute the opacity due to a given absorption transition. 
+
+# Arguments
+
+- `λ` is the wavelenghths (``cm``).
+- `N` the column density (``cm^{-2}``).
+- `DopplerBroadening` is the Doppler broadening (``cm~s^{-1}``).
+- `z` is the source redshift.
+- `transition` is a tuple formed by the central wawelength (``cm``), the oscillator 
+    strength and the damping coefficient (``s^{-1}``) for the given transition. 
+
+The Doppler broadening factor is typicaly due to either an intrinsic thermal broadening 
+(``b_K = \\sqrt{2KT/m}``) or to a turbulent motion of the gas (``b_T = \\sqrt{σ_T}``, 
+where ``σ_T`` is the inner velocity dispersion). These two factors can be summed in 
+quadrature, i.e. ``b = \\sqrt{b_K^2 + b_T^2}``.
 
 
 # Examples
 ```jldoctest
+
 TauVoigt(range(start=1494.5,stop=1495.5,step=0.1) .* 1e-8,1e18,1e5,0.,[1495.05*1e-8,0.54,8.106e8])
 
 # output
@@ -589,12 +617,17 @@ end
 """
     VoigtFuncTG(a,v)
 
-Approximates the Voigt (or line broadening function) function. It was introduced by [Tepper-Garcia (2006)](https://ui.adsabs.harvard.edu/abs/2006MNRAS.369.2025T/abstract). It is of [high accuracy](https://en.wikipedia.org/wiki/Voigt_profile) provided that ``a \\le 10^{-4}``. The ``a`` and ``v`` parameters are defined as:
-``a = \\frac{\\Gamma \\lambda_c}{4\\pi b 10^{13}}`` and ``v = \\frac{(\\lambda_c - \\lambda)c}{b \\lambda_c \\sqrt{2 \\log 2}}``, where ``\\lambda_c`` is the central wavelength of the transition, ``c`` the speed of light, ``b`` the Doppler broadening factor and ``\\Gamma`` the damping coefficient.
+Approximate the Voigt (or line broadening function) function. 
+
+It was introduced by [Tepper-Garcia (2006)](https://ui.adsabs.harvard.edu/abs/2006MNRAS.369.2025T/abstract). 
+It is of [high accuracy](https://en.wikipedia.org/wiki/Voigt_profile) provided that ``a \\le 10^{-4}``. 
+The ``a`` and ``v`` parameters are defined as: 
+    ``a = \\frac{\\Gamma \\lambda_c}{4\\pi b 10^{13}}`` and ``v = \\frac{(\\lambda_c - \\lambda)c}{b \\lambda_c \\sqrt{2 \\log 2}}``, where ``\\lambda_c`` is the central wavelength of the transition, ``c`` the speed of light, ``b`` the Doppler broadening factor and ``\\Gamma`` the damping coefficient.
 
 
 # Examples
 ```jldoctest
+
 FittingFunction.VoigtFunctTG(1e-5,1.)
 
 # output
@@ -611,8 +644,6 @@ function VoigtFunctTG(a,v)
     res3 = H0.^2 .* (4 .* F.^2 .+ 7 .* F .+ 4 .+ Q) .- Q .- 1
     return res1 .- res2 .* res3
 end
-
-
 
 
 
@@ -694,11 +725,20 @@ end
 """
     XAbs(E; NH=1e20, z=0)
 
-Computes the effective absorption cross section per hydrogen atom following [Morrison & McCammon (1983)](https://ui.adsabs.harvard.edu/abs/1983ApJ...270..119M/abstract). 'E' is the energy (KeV, in the 0.03-10 KeV range), 'NH' is the column density of hydrogen atom (particle per square cm) and 'z' is the redshift.
+Compute the effective absorption cross section per hydrogen atom.
+
+It is based on the [Morrison & McCammon (1983)](https://ui.adsabs.harvard.edu/abs/1983ApJ...270..119M/abstract) recipe. 
+
+# Arguments
+
+- `E` is the energy (KeV, in the 0.03-10 KeV range).
+- `N` is the column density  (particle per square cm).
+- `z` is the redshift.
 
 
 # Examples
 ```jldoctest
+
 XAbs([0.5,1.25,2.], NH=1e20, z=0)
 
 # output
