@@ -345,12 +345,24 @@ end
 """
     Pol2Stokes(i, p, t, c; ep=0.0, et=0.0, ec=0.0)
 
-Computes the Stokes parameters for a given polarisation degree and position angle. 'i' is total intensity, 'p' the polarisation degree, 't' the position angle (randians) and 'c' the circular polarisation. The errors 'ep', 'ew, and 'e' are optional.
-The ouput is: intensity 'q', 'u', 'v' Stokes parameters and respective errors.
+Compute the Stokes parameters for a given polarisation degree and position angle. 
+
+# Arguments
+
+- `i` total intensity. 
+- `p` polarisation degree.
+- `t` position angle (randians).
+- `c` the circular polarisation. 
+- `ep` polarization uncertainty.
+- `et` position angle uncertainty.
+- `ec` circular polarization uncertainty.
+
+The ouput is: intensity `q`, `u`, `v` Stokes parameters and respective errors.
 
 
 # Examples
 ```jldoctest
+
 Pol2Stokes(1.,0.1,0.1,0.)
 
 # output
@@ -377,11 +389,20 @@ end
 """
     SBPL(E,N,α,β,Eb)
 
-Computes a smoothly joint broken power-law with spectral index 'α' and 'β', a break at 'Eb', normalization 'N' and input energy'E'.
+Compute a smoothly joint broken power-law.
+
+# Arguemnts 
+
+- `α` pre-break spectral index.
+- `β` post-break spectral index.
+- `Eb` break energy. 
+- `N` normalization.
+- `E` input energy.
 
 
 # Examples
 ```jldoctest
+
 SBPL(6.,1.,-1.,-1.5,5.)
 
 # output
@@ -401,11 +422,22 @@ end
 """
     SBPL2(E,N,α,β,γ,Eb1,Eb2)
 
-Computes a smoothly joint double broken power-law with spectral index 'α', 'β' and 'γ', and two breaks at 'Eb1' and 'Eb2'. The normalization is 'N' and the input energy 'E'.
+Compute a smoothly joint double broken power-law.
+
+# Arguments
+
+- `α` pre-break spectral index.
+- `β` inter-break spectral index.
+- `γ` post-break spectral index.
+- `Eb1` first break energy.
+- `Eb2` second break energy.
+- `N` normalization.
+- `E` input energy.
 
 
 # Examples
 ```jldoctest
+
 SBPL2([4.,6.,8.],1.,-1.,-1.5,-2.,5.,7.)
 
 # output
@@ -432,10 +464,20 @@ end
 """
     SigmaClip(x, ex=ones(size(x)); sigmacutlevel=2)
 
-Filters an input array 'x' with optional uncertainties 'ex' with one-iteration sigma clipping at the level 'sigmacutlevel'. It reports a mask to select the surviving elements in the input arrays or other relwted arrays.
+Sigma-clipping filtering of an input array,
+
+# Arguments
+
+- `x` input array.
+- `ex` uncertainties.
+- `sigmacutlevel` sigma-clipping level.
+
+It performs a one-iteration sigma clipping and reports a mask to select the 
+surviving elements in the input arrays or other related arrays.
 
 # Examples
 ```jldoctest
+
 x = [4.,6.,8.,1.,3.,5.,20.]
 mask = SigmaClip(x)
 x[mask]
