@@ -95,7 +95,14 @@ end
 """
     Counts2Mag(cts,ects;zp=25.0,ezp=0.0)
 
-Convert counts (or flux) 'cts', with uncertainty 'ects', to magnitude scale with zero-point 'zp' and relative uncertainty.
+Convert counts (or flux) to magntudes,
+
+# Arguments
+
+- `cts` counts.
+- `ects` count uncertainty.
+- `zp` magnitude zero-point 
+- `zp` zero-point uncertainty.
 
 
 # Examples
@@ -122,11 +129,21 @@ FFGals = Dict("MW" => 3.12, "SMC" => 2.74, "LMC" => 3.41, "Any" => 4.0)
 """
     Extinction(wave,EBV;gal="SMC",Rv=FFGals["SMC"],z=0.)
 
-Compute the UV/optical/extinction at the input wavelength 'wave', in Angstrom. 'EBV' is E(B-V) in magnitudes, 'gal' is one of the galaxy extinction recipes listed in the 'FFGals' (exported) dictionary. 'Rv' is the seelctive extinction and 'z' is the redshift of the absorpber. References about the adopted extinction curves are discussed in the documentation of the [DustExtinction](https://juliaastro.org/DustExtinction.jl/stable/) package.
+Compute the UV/optical/extinction.
+
+# Argguments
+
+- `wave` input wavelengths (Angstrom). 
+- `EBV` color excess E(B-V) (magnitude).
+- `gal` one of the galaxy extinction recipes listed in the 'FFGals' (exported) dictionary. 
+- `Rv` selective extinction. 
+- `z` redshift of the absorpber. 
+
+References about the adopted extinction curves are discussed in the documentation of the 
+[DustExtinction](https://juliaastro.org/DustExtinction.jl/stable/) package.
 
 
 # Examples
-
 
 ```jldoctest
 Extinction(5500.,1,gal="MW",Rv=FFGals["MW"],z=0.)
@@ -156,11 +173,10 @@ end
 
 
 
-
 """
     GaussAbs(E,Ed,σ,El)
 
-Computes a Gaussian absorption with depth 'Ed' at energy 'E' with center in 'El' and width (FWHM/2.35) 'σ'. 'A.
+Compute a Gaussian absorption with depth 'Ed' at energy 'E' with center in 'El' and width (FWHM/2.35) 'σ'. 'A.
 
 
 # Examples
