@@ -33,10 +33,18 @@ export XAbs
 """
     Band(E,α,β,E₀,A)
 
-Compute the so-called 'Band function', at input energy 'E'. 'α' is the low-energy index, 'β' the high-energy index and 'E₀' the break energy. 'A' is the normalization. The peak-energy is 'Ep = (2+α)E₀'.
+Compute the so-called 'Band function'
+
+#Arguments 
+- `E` input energy. 
+- `α` low-energy index.
+- `β` high-energy index.
+- `E₀` break energy. 
+- `A` normalization. 
+
+The peak-energy is then ``Ep = (2+α)E₀``.
 
 # Examples
-
 
 ```jldoctest
 Band(300.,-2.,-1.,200.,1.)
@@ -57,10 +65,19 @@ end
 """
     CPL(E,N,α,Ec;E0=1.)
 
-Computes a cut-off power-law with spectral index 'α' and normalization 'N' at input 'E' and cut-off energy 'Ec'. You can normalize the power-law at 'E0'.
+Compute a cut-off power-law.
+
+# Arguments
+
+- `α` spectral index.
+- `N` normalization.
+- `E` input energy.
+- `Ec` cut-off energy. 
+- `E0` energy for power-law normalization.
 
 
 # Examples
+
 ```jldoctest
 CPL(3.,1.,-1.,2.)
 
