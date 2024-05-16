@@ -176,11 +176,20 @@ end
 """
     GaussAbs(E,Ed,σ,El)
 
-Compute a Gaussian absorption with depth 'Ed' at energy 'E' with center in 'El' and width (FWHM/2.35) 'σ'. 'A.
+Compute a Gaussian absorption.
+
+# Arguments
+
+- `Ed` depth.  at 
+- `E` input energy. 
+- `El` absorption center.
+- `σ` absorption width (``FWHM/2.35``). 
+- `A` normalization.
 
 
 # Examples
 ```jldoctest
+
 GaussAbs(2.,1.,0.1,2.)
 
 # output
@@ -201,11 +210,19 @@ end
 """
     Gaussian(E,A,σ,El)
 
-Computes a Gaussian at energy 'E' with center in 'El' and width (FWHM/2.35) 'σ'. 'A is the normalization.
+Compute a Gaussian.
+
+# Arguments 
+
+- `E` input energy.
+- `El` Gussian center.
+- `σ` absorption width (``FWHM/2.35``). 
+- `A` normalization.
 
 
 # Examples
 ```jldoctest
+
 Gaussian(3.,1.,0.1,2.)
 
 # output
@@ -226,7 +243,9 @@ AvailableAtomicTables = ["FitLyman","JitrikBunge04","VALD3"]
 """
     GetAtomicData(table::String="")::DataFrame
 
-Provides a table with atomic data among those available. Calling the function with no parameter shows the available tables. At present we have:
+Return a table with atomic data among those available. 
+
+Calling the function with no parameter shows the available tables. At present we have:
 
 * "FitLyman". This is the original table generated for the ["FitLyman" ESO-MIDAS](https://ui.adsabs.harvard.edu/abs/1995Msngr..80...37F/abstract) package.
 * "JitrikBunge04". This is a collection of atomic data prepared by [Jitrik & Bunge (2004)](https://ui.adsabs.harvard.edu/abs/2004JPCRD..33.1059J/abstract).
@@ -263,11 +282,18 @@ end
 """
     Mag2Counts(mag,emag;zp=25.0)
 
-Convert magnitudes 'mag' with uncertainty 'emag' to counts (or flux) with zero-point 'zp'.
+Convert magnitudes to counts (or flux).
+
+# Arguments
+
+- `mag` input magnitude.
+- `emag` magnitude uncertainty.
+- `zp` zero-point.
 
 
 # Examples
 ```jldoctest
+
 Mag2Counts(20,0.1)
 
 # output
@@ -286,11 +312,19 @@ end
 """
     PL(E,N,α;E0=1.)
 
-Computes a power-law with spectral index 'α' and normalization 'N' at input 'E'. You can normalize the power-law at 'E0'.
+Compute a power-law with.
+
+# Arguments
+
+- `α` spectral index.
+- `N` normalization.
+- `E` input energy.
+- `E0` power-law energy normalization.
 
 
 # Examples
 ```jldoctest
+
 PL(3.,1.,-1.)
 
 # output
