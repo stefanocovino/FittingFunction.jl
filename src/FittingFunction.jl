@@ -13,11 +13,13 @@ using Unitful
 export Band
 export CPL
 export Counts2Mag
+export Ecm2sA2Jy
 export Extinction
 export FFGals
 export GaussAbs
 export Gaussian
 export GetAtomicData
+export Jy2Ecm2sA
 export Mag2Counts
 export PL
 export Pol2Stokes
@@ -35,12 +37,12 @@ export XAbs
 
 Compute the so-called 'Band function'
 
-#Arguments 
-- `E` input energy. 
+#Arguments
+- `E` input energy.
 - `α` low-energy index.
 - `β` high-energy index.
-- `E₀` break energy. 
-- `A` normalization. 
+- `E₀` break energy.
+- `A` normalization.
 
 The peak-energy is then ``Ep = (2+α)E₀``.
 
@@ -72,7 +74,7 @@ Compute a cut-off power-law.
 - `α` spectral index.
 - `N` normalization.
 - `E` input energy.
-- `Ec` cut-off energy. 
+- `Ec` cut-off energy.
 - `E0` energy for power-law normalization.
 
 
@@ -101,7 +103,7 @@ Convert counts (or flux) to magntudes,
 
 - `cts` counts.
 - `ects` count uncertainty.
-- `zp` magnitude zero-point 
+- `zp` magnitude zero-point
 - `zp` zero-point uncertainty.
 
 
@@ -125,6 +127,41 @@ end
 
 
 
+
+"""
+    Ecm2sA2Jy(fluden, lambd)
+
+Convert flux densities in ``erg~s^{-1} cm^{-2} Angstrom^{-1}`` to ``Jy``.
+
+
+# Arguments
+
+- `fluden` flux density (``erg~s^{-1} cm^{-2} Angstrom^{-1}``).
+- `lambd` wavelength (``Angstrom``).
+
+
+# Examples
+```jldoctest
+
+Ecm2sA2Jy([1.2e-15,2e-15,2.5e-15],[5000,5500,6000])
+
+# output
+
+3-element Vector{Float64}:
+ 0.001
+ 0.002016666666666667
+ 0.0029999999999999996
+```
+"""
+function Ecm2sA2Jy(fluden, lambd)
+    return 3e41 .* fluden ./ (3e18 ./ lambd).^2
+end
+
+
+
+
+
+
 FFGals = Dict("MW" => 3.12, "SMC" => 2.74, "LMC" => 3.41, "Any" => 4.0)
 """
     Extinction(wave,EBV;gal="SMC",Rv=FFGals["SMC"],z=0.)
@@ -133,13 +170,13 @@ Compute the UV/optical/extinction.
 
 # Argguments
 
-- `wave` input wavelengths (Angstrom). 
+- `wave` input wavelengths (Angstrom).
 - `EBV` color excess E(B-V) (magnitude).
-- `gal` one of the galaxy extinction recipes listed in the 'FFGals' (exported) dictionary. 
-- `Rv` selective extinction. 
-- `z` redshift of the absorpber. 
+- `gal` one of the galaxy extinction recipes listed in the 'FFGals' (exported) dictionary.
+- `Rv` selective extinction.
+- `z` redshift of the absorpber.
 
-References about the adopted extinction curves are discussed in the documentation of the 
+References about the adopted extinction curves are discussed in the documentation of the
 [DustExtinction](https://juliaastro.org/DustExtinction.jl/stable/) package.
 
 
@@ -180,10 +217,10 @@ Compute a Gaussian absorption.
 
 # Arguments
 
-- `Ed` depth.  at 
-- `E` input energy. 
+- `Ed` depth.  at
+- `E` input energy.
 - `El` absorption center.
-- `σ` absorption width (``FWHM/2.35``). 
+- `σ` absorption width (``FWHM/2.35``).
 - `A` normalization.
 
 
@@ -212,11 +249,11 @@ end
 
 Compute a Gaussian.
 
-# Arguments 
+# Arguments
 
 - `E` input energy.
 - `El` Gussian center.
-- `σ` absorption width (``FWHM/2.35``). 
+- `σ` absorption width (``FWHM/2.35``).
 - `A` normalization.
 
 
@@ -243,7 +280,7 @@ AvailableAtomicTables = ["FitLyman","JitrikBunge04","VALD3"]
 """
     GetAtomicData(table::String="")::DataFrame
 
-Return a table with atomic data among those available. 
+Return a table with atomic data among those available.
 
 Calling the function with no parameter shows the available tables. At present we have:
 
@@ -273,6 +310,40 @@ function GetAtomicData(table::String="")::DataFrame
       return DataFrame()
     end
 end
+
+
+
+
+
+"""
+    Jy2Ecm2sA(fluden, lambd)
+
+Convert flux densities in ``Jy`` to ``erg~s^{-1} cm^{-2} Angstrom^{-1}``.
+
+
+# Arguments
+
+- `fluden` flux density (``Jy``).
+- `lambd` wavelength (``Angstrom``).
+
+
+# Examples
+```jldoctest
+
+Jy2Ecm2sA([1e-3,2e-3,3e-3],[5000,5500,6000])
+
+# output
+
+3-element Vector{Float64}:
+ 1.2000000000000002e-15
+ 1.9834710743801656e-15
+ 2.5e-15
+```
+"""
+function Jy2Ecm2sA(fluden, lambd)
+    return fluden .* 3e-5 ./ lambd.^2
+end
+
 
 
 
@@ -345,14 +416,14 @@ end
 """
     Pol2Stokes(i, p, t, c; ep=0.0, et=0.0, ec=0.0)
 
-Compute the Stokes parameters for a given polarisation degree and position angle. 
+Compute the Stokes parameters for a given polarisation degree and position angle.
 
 # Arguments
 
-- `i` total intensity. 
+- `i` total intensity.
 - `p` polarisation degree.
 - `t` position angle (randians).
-- `c` the circular polarisation. 
+- `c` the circular polarisation.
 - `ep` polarization uncertainty.
 - `et` position angle uncertainty.
 - `ec` circular polarization uncertainty.
@@ -391,11 +462,11 @@ end
 
 Compute a smoothly joint broken power-law.
 
-# Arguemnts 
+# Arguemnts
 
 - `α` pre-break spectral index.
 - `β` post-break spectral index.
-- `Eb` break energy. 
+- `Eb` break energy.
 - `N` normalization.
 - `E` input energy.
 
@@ -472,7 +543,7 @@ Sigma-clipping filtering of an input array,
 - `ex` uncertainties.
 - `sigmacutlevel` sigma-clipping level.
 
-It performs a one-iteration sigma clipping and reports a mask to select the 
+It performs a one-iteration sigma clipping and reports a mask to select the
 surviving elements in the input arrays or other related arrays.
 
 # Examples
@@ -521,7 +592,7 @@ Compute the polarisation degree and position angle from the Stokes parameters.
 - `eu` uncertainty on the `u` parameter.
 - `ev` uncertainty on the `v` parameter.
  
-The ouput is given by the intensity `i`, polarisation degree, `p`, position angle 
+The ouput is given by the intensity `i`, polarisation degree, `p`, position angle
 (randians) `theta` and circular polarisation `chi`, with respective errors.
 
 
@@ -559,7 +630,7 @@ ee = ustrip(ElementaryCharge)/3.3356e−10;
 """
     TauVoigt(λ,NHI,DopplerBroadening,z,transition)
 
-Compute the opacity due to a given absorption transition. 
+Compute the opacity due to a given absorption transition.
 
 # Arguments
 
@@ -567,12 +638,12 @@ Compute the opacity due to a given absorption transition.
 - `N` the column density (``cm^{-2}``).
 - `DopplerBroadening` is the Doppler broadening (``cm~s^{-1}``).
 - `z` is the source redshift.
-- `transition` is a tuple formed by the central wawelength (``cm``), the oscillator 
-    strength and the damping coefficient (``s^{-1}``) for the given transition. 
+- `transition` is a tuple formed by the central wawelength (``cm``), the oscillator
+    strength and the damping coefficient (``s^{-1}``) for the given transition.
 
-The Doppler broadening factor is typicaly due to either an intrinsic thermal broadening 
-(``b_K = \\sqrt{2KT/m}``) or to a turbulent motion of the gas (``b_T = \\sqrt{σ_T}``, 
-where ``σ_T`` is the inner velocity dispersion). These two factors can be summed in 
+The Doppler broadening factor is typicaly due to either an intrinsic thermal broadening
+(``b_K = \\sqrt{2KT/m}``) or to a turbulent motion of the gas (``b_T = \\sqrt{σ_T}``,
+where ``σ_T`` is the inner velocity dispersion). These two factors can be summed in
 quadrature, i.e. ``b = \\sqrt{b_K^2 + b_T^2}``.
 
 
@@ -617,11 +688,11 @@ end
 """
     VoigtFuncTG(a,v)
 
-Approximate the Voigt (or line broadening function) function. 
+Approximate the Voigt (or line broadening function) function.
 
-It was introduced by [Tepper-Garcia (2006)](https://ui.adsabs.harvard.edu/abs/2006MNRAS.369.2025T/abstract). 
-It is of [high accuracy](https://en.wikipedia.org/wiki/Voigt_profile) provided that ``a \\le 10^{-4}``. 
-The ``a`` and ``v`` parameters are defined as: 
+It was introduced by [Tepper-Garcia (2006)](https://ui.adsabs.harvard.edu/abs/2006MNRAS.369.2025T/abstract).
+It is of [high accuracy](https://en.wikipedia.org/wiki/Voigt_profile) provided that ``a \\le 10^{-4}``.
+The ``a`` and ``v`` parameters are defined as:
     ``a = \\frac{\\Gamma \\lambda_c}{4\\pi b 10^{13}}`` and ``v = \\frac{(\\lambda_c - \\lambda)c}{b \\lambda_c \\sqrt{2 \\log 2}}``, where ``\\lambda_c`` is the central wavelength of the transition, ``c`` the speed of light, ``b`` the Doppler broadening factor and ``\\Gamma`` the damping coefficient.
 
 
@@ -727,7 +798,7 @@ end
 
 Compute the effective absorption cross section per hydrogen atom.
 
-It is based on the [Morrison & McCammon (1983)](https://ui.adsabs.harvard.edu/abs/1983ApJ...270..119M/abstract) recipe. 
+It is based on the [Morrison & McCammon (1983)](https://ui.adsabs.harvard.edu/abs/1983ApJ...270..119M/abstract) recipe.
 
 # Arguments
 
