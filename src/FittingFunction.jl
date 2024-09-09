@@ -1,8 +1,10 @@
 module FittingFunction
 
+using AbstractFFTs
 using CSV
 using DataFrames
 using DustExtinction
+using FFTW
 using PhysicalConstants.CODATA2018
 using StatsBase
 using Unitful
@@ -16,6 +18,7 @@ export Counts2Mag
 export Ecm2sA2Jy
 export Extinction
 export FFGals
+export FourierPeriodogram
 export GaussAbs
 export Gaussian
 export GetAtomicData
@@ -207,7 +210,43 @@ function Extinction(wave,EBV;gal="SMC",Rv=FFGals["SMC"],z=0.)
 end
 
 
+"""
+    FourierPeriodogram(signal,fs;zerofreq=true)
 
+Compute the discrete Fourier periodogram for the inpout signal.
+
+
+# Arguments
+
+- `signal` array of input data.
+- `fs` sampling in frequency of the input data (1/dt).
+- 'zerofreq' is true (false) to (not) include the zero frequency in the output. 
+
+Outputs are two arrays: the frequencies and the powers.
+
+
+# Examples
+```jldoctest
+
+FourierPeriodogram([1.,2.,3.,4.],1.)
+
+# output
+
+([0.0, 0.25], [100.0, 8.000000000000002])
+```
+"""
+function FourierPeriodogram(signal,fs;zerofreq=true)
+    N = length(signal)
+    freqs = fftfreq(N,fs)
+    if zerofreq
+        positive = freqs .>= 0
+    else
+        positive = freqs .> 0
+    end
+    ft = fft(signal)
+    powers = abs.(ft).^2
+    return freqs[positive], powers[positive]
+end
 
 
 """
