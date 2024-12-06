@@ -32,6 +32,7 @@ export SigmaClip
 export Stokes2Pol
 export TauVoigt
 export XAbs
+export Z2N
 
 
 
@@ -862,6 +863,52 @@ XAbs([0.5,1.25,2.], NH=1e20, z=0)
 function XAbs(E; NH=1e20, z=0)
     return map(e -> FittingFunction.XAbsorption(e, NH=NH, z=z), E)
 end
+
+
+
+"""
+    Z2N(freqs, time)
+
+Compute the Rayleigh power spectrum of a time series in a given range of frequencies.
+
+# Arguments
+
+- `freqs` is an array with frequencies in units of 1/[time].
+- `time` is an array with the time series where to find a period.
+- `harm` is the number of harmonics to be used in the analysis.
+
+
+# Examples
+```jldoctest
+
+Z2N([1.,0.5,0.25], [1.,2.,2.5,3.5,5.])
+
+# output
+
+3-element Vector{Any}:
+ 0.4
+ 0.4000000000000002
+ 0.537258300203048
+```
+"""
+function Z2N(freqs, time; harm=1)
+    N = length(time)
+    Z2n = []
+    for ni in freqs
+        aux = 0
+        for k in 1:harm
+            Phi = mod.(ni .* time,1)
+            arg = k .* Phi*2.0*π
+            phicos = cos.(arg)
+            phisin = sin.(arg)
+            aux = aux .+ (sum(phicos)^2 + sum(phisin)^2)
+        end
+        push!(Z2n,(2.0/N)*aux)
+    end
+    return Z2n
+end
+
+
 
 
 end
