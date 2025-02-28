@@ -24,6 +24,7 @@ export Gaussian
 export GetAtomicData
 export Jy2Ecm2sA
 export Mag2Counts
+export NorrisPulse
 export PL
 export Pol2Stokes
 export SBPL
@@ -221,7 +222,7 @@ Compute the discrete Fourier periodogram for the inpout signal.
 
 - `signal` array of input data.
 - `fs` sampling in frequency of the input data (1/dt).
-- 'zerofreq' is true (false) to (not) include the zero frequency in the output. 
+- 'zerofreq' is true (false) to (not) include the zero frequency in the output.
 
 Outputs are two arrays: the frequencies and the powers.
 
@@ -417,6 +418,64 @@ function Mag2Counts(mag, emag; zp=25.0)
     ects = (emag .* cts) ./ (2.5 ./ log(10.0))
     return cts, ects
 end
+
+
+
+
+"""
+    NorrisPulse(x;pulsNorm,tmax,σ_rise,σ_decay,pulsSharpness,base)
+
+Compute an asymmetric pulse shape according to the recipe reported in [Norris et al. (1996).](https://ui.adsabs.harvard.edu/abs/1996ApJ...459..393N/abstract).
+
+# Arguments
+
+- `x` input vector.
+- `pulsNorm` the nornalization of the pulse.
+- `tmax` the maximum of the pulse.
+- `σ_rise` the time-scale of the rising phase.
+- `σ_decay` the time-scale of the decaying phase.
+- `pulsSharpness` pulse sharpness parameter.
+- `base` signal level without the pulse.
+
+
+# Examples
+```jldoctest
+
+NorrisPulse([1.,2.,3.,4.,5.],pulsNorm=1.5,tmax=3.,σ_rise=1.,σ_decay=2.,pulsSharpness=1.1,base=0.3)
+
+# output
+
+5-element Vector{Float64}:
+ 0.47585740398559895
+ 0.8518191617571635
+ 1.8
+ 1.2407748943132098
+ 0.8518191617571635
+```
+"""
+function NorrisPulse(x;pulsNorm,tmax,σ_rise,σ_decay,pulsSharpness,base)
+    #
+    f1(x) = base .+ pulsNorm .* exp.(-((abs.(x .- tmax)) ./ σ_rise).^pulsSharpness)
+    f2(x) = base .+ pulsNorm .* exp.(-((abs.(x .- tmax)) ./ σ_decay).^pulsSharpness)
+    #
+    fv = [f1,f2]
+    #
+    return piecewise(x,[tmax,],fv)
+end
+
+
+
+function piecewise(x::Float64, breakpts::Vector{Float64}, f::Vector{Function})
+    @assert(issorted(breakpts))
+    @assert(length(f) == length(breakpts)+1)
+    b = searchsortedfirst(breakpts, x)
+    return f[b](x)
+end
+
+piecewise(X::Vector{Float64}, bpts, f) = [piecewise(x,bpts,f) for x in X ]
+
+
+
 
 
 
