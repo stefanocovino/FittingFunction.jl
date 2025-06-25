@@ -189,7 +189,7 @@ Extinction(5500.,1,gal="MW",Rv=FFGals["MW"],z=0.)
 
 # output
 
-0.06017150537641227
+0.06016612224448964
 ```
 """
 function Extinction(wave,EBV;gal="SMC",Rv=FFGals["SMC"],z=0.)
