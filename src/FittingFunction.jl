@@ -1,6 +1,5 @@
 module FittingFunction
 
-using AbstractFFTs
 using CSV
 using DataFrames
 using DustExtinction
@@ -18,7 +17,6 @@ export Counts2Mag
 export Ecm2sA2Jy
 export Extinction
 export FFGals
-export FourierPeriodogram
 export GaussAbs
 export Gaussian
 export GetAtomicData
@@ -29,11 +27,10 @@ export PL
 export Pol2Stokes
 export SBPL
 export SBPL2
-export SigmaClip
+export SmoothPL
 export Stokes2Pol
 export TauVoigt
 export XAbs
-export Z2N
 
 
 
@@ -212,43 +209,6 @@ function Extinction(wave,EBV;gal="SMC",Rv=FFGals["SMC"],z=0.)
 end
 
 
-"""
-    FourierPeriodogram(signal,fs;zerofreq=true)
-
-Compute the discrete Fourier periodogram for the inpout signal.
-
-
-# Arguments
-
-- `signal` array of input data.
-- `fs` sampling in frequency of the input data (1/dt).
-- 'zerofreq' is true (false) to (not) include the zero frequency in the output.
-
-Outputs are two arrays: the frequencies and the powers.
-
-
-# Examples
-```jldoctest
-
-FourierPeriodogram([1.,2.,3.,4.],1.)
-
-# output
-
-([0.0, 0.25], [100.0, 8.000000000000002])
-```
-"""
-function FourierPeriodogram(signal,fs;zerofreq=true)
-    N = length(signal)
-    freqs = fftfreq(N,fs)
-    if zerofreq
-        positive = freqs .>= 0
-    else
-        positive = freqs .> 0
-    end
-    ft = fft(signal)
-    powers = abs.(ft).^2
-    return freqs[positive], powers[positive]
-end
 
 
 """
@@ -425,7 +385,7 @@ end
 """
     NorrisPulse(x;pulsNorm,tmax,σ_rise,σ_decay,pulsSharpness,base)
 
-Compute an asymmetric pulse shape according to the recipe reported in [Norris et al. (1996).](https://ui.adsabs.harvard.edu/abs/1996ApJ...459..393N/abstract).
+Compute an asymmetric pulse shape according to the recipe reported in [Norris et al. (1996)](https://ui.adsabs.harvard.edu/abs/1996ApJ...459..393N/abstract).
 
 # Arguments
 
@@ -632,46 +592,37 @@ end
 
 
 """
-    SigmaClip(x, ex=ones(size(x)); sigmacutlevel=2)
+    SmoothPL(E,N,α1,α2,,EB=1.;s=1.)
 
-Sigma-clipping filtering of an input array,
+Compute a smoothly joint power-law with smoothness parameter.
 
 # Arguments
 
-- `x` input array.
-- `ex` uncertainties.
-- `sigmacutlevel` sigma-clipping level.
+- `α1` pre-break spectral index.
+- `α1` post-break spectral index.
+- `N` normalization.
+- `E` input energy.
+- `E0` power-law energy normalization.
+- `s` smoothness parameter.
 
-It performs a one-iteration sigma clipping and reports a mask to select the
-surviving elements in the input arrays or other related arrays.
 
 # Examples
 ```jldoctest
 
-x = [4.,6.,8.,1.,3.,5.,20.]
-mask = SigmaClip(x)
-x[mask]
+SmoothPL(3.,1.,-0.5,-1.5,1.,s=1.1)
 
 # output
 
-6-element Vector{Float64}:
- 4.0
- 6.0
- 8.0
- 1.0
- 3.0
- 5.0
+3.4226591419723746
 ```
 """
-function SigmaClip(x, ex=ones(size(x)); sigmacutlevel=2)
-    w = pweights(1 ./ ex.^2)
-    m = mean(x,w)
-    s = std(x,w)
-    #println(m," ",s)
-    #
-    flt = (m-sigmacutlevel*s .<= x) .& (x .<= m+sigmacutlevel*s)
-    return flt
+function SmoothPL(E,N,α1,α2,Eb;s=1.)
+    ff = N .* .^(E./Eb, -α1)
+    specin = 0.5 * (1 .+ .^(E./Eb,1/s))
+    specout = .^(specin,(α1-α2)*s)
+    return ff .* specout
 end
+
 
 
 
@@ -924,48 +875,6 @@ function XAbs(E; NH=1e20, z=0)
 end
 
 
-
-"""
-    Z2N(freqs, time)
-
-Compute the Rayleigh power spectrum of a time series in a given range of frequencies.
-
-# Arguments
-
-- `freqs` is an array with frequencies in units of 1/[time].
-- `time` is an array with the time series where to find a period.
-- `harm` is the number of harmonics to be used in the analysis.
-
-
-# Examples
-```jldoctest
-
-Z2N([1.,0.5,0.25], [1.,2.,2.5,3.5,5.])
-
-# output
-
-3-element Vector{Any}:
- 0.4
- 0.4000000000000002
- 0.537258300203048
-```
-"""
-function Z2N(freqs, time; harm=1)
-    N = length(time)
-    Z2n = []
-    for ni in freqs
-        aux = 0
-        for k in 1:harm
-            Phi = mod.(ni .* time,1)
-            arg = k .* Phi*2.0*π
-            phicos = cos.(arg)
-            phisin = sin.(arg)
-            aux = aux .+ (sum(phicos)^2 + sum(phisin)^2)
-        end
-        push!(Z2n,(2.0/N)*aux)
-    end
-    return Z2n
-end
 
 
 
