@@ -12,6 +12,7 @@ using Unitful
 
 
 export Band
+export BknPow
 export CPL
 export Counts2Mag
 export Ecm2sA2Jy
@@ -63,6 +64,69 @@ function Band(E,α,β,E₀,A)
     f2 = A .* (E ./ 100.).^β .* exp.(β .- α) .* ((α .- β) .* E₀ ./ 100.).^(α .- β)
     return ifelse.(E .<= (α .- β) .* E₀, f1, f2)
 end
+
+
+
+"""
+    BknPow(Evals::AbstractVector{<:Real}, breaks::AbstractVector{<:Real}, alphas::AbstractVector{<:Real})
+
+Compute a 'broken power-law' at the input values 'Evals'.
+
+#Arguments
+- `Evals`: Vectors of input energies.
+- `breaks`: Ordered vector of break points.
+- `alphas`: Ordered vector of power-law indices.
+
+"""
+function BknPow(Evals::AbstractVector{<:Real}, breaks::AbstractVector{<:Real}, alphas::AbstractVector{<:Real})
+    # Input validation
+    if length(breaks) != length(alphas) - 1
+        throw(ArgumentError("Size mismatch. There should be one more 'alphas' then 'breaks'."))
+    end
+    
+    min_x, max_x = extrema(Evals)
+    if any(b -> b < min_x || b > max_x, breaks)
+        throw(ArgumentError("One or more break is outside the 'Evals' limits."))
+    end
+
+    p = sortperm(Evals)
+    sorted_x = Evals[p]
+
+    y_sorted = similar(sorted_x, Float64)
+
+    breakpoints = [first(sorted_x); breaks; last(sorted_x)]
+    
+    last_idx = 0
+    last_y_val = 0.0
+
+    for i in 1:length(alphas)
+        if i == length(alphas)
+             current_indices = (last_idx + 1):length(sorted_x)
+        else
+             end_idx = searchsortedlast(sorted_x, breakpoints[i+1])
+             current_indices = (last_idx + 1):end_idx
+        end
+        
+        if isempty(current_indices)
+            continue
+        end
+
+        y_chunk = sorted_x[current_indices] .^ alphas[i]
+        
+        if i > 1
+            scale_factor = last_y_val / y_chunk[1]
+            y_chunk .*= abs(scale_factor)
+        end
+        
+        y_sorted[current_indices] .= y_chunk
+        
+        last_y_val = last(y_chunk)
+        last_idx = last(current_indices)
+    end
+    
+    return y_sorted[invperm(p)]
+end
+
 
 
 
