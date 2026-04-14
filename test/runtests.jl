@@ -1,6 +1,8 @@
 using DataFrames
 using FittingFunction
+using PhotometricFilters
 using Test
+using Unitful
 
 
 @testset "FittingFunction.jl" begin
@@ -38,14 +40,21 @@ using Test
     #
     @test typeof(GetAtomicData()) == typeof(DataFrame())
     #
-    @test Jy2Ecm2sA([1e-3,2e-3,3e-3],[5000,5500,6000]) == [1.2000000000000002e-15,1.9834710743801656e-15,2.5e-15]
+    @test isapprox(Jy2Ecm2sA([1e-3,2e-3,3e-3],[5000,5500,6000]),[1.2000000000000002e-15,1.9834710743801656e-15,2.5e-15],rtol=1e-3)
     #
-    @test Ecm2sA2Jy([1.2e-15,2e-15,2.5e-15],[5000,5500,6000]) == [0.001,0.002016666666666667,0.0029999999999999996]
+    @test isapprox(Ecm2sA2Jy([1.2e-15,2e-15,2.5e-15],[5000,5500,6000]),[0.001,0.002016666666666667,0.0029999999999999996],rtol=1e-3)
     #
     @test NorrisPulse([1.,2.,3.,4.,5.],pulsNorm=1.5,tmax=3.,σ_rise=1.,σ_decay=2.,pulsSharpness=1.1,base=0.3) == [0.47585740398559895, 0.8518191617571635, 1.8, 1.2407748943132098, 0.8518191617571635]
     #
     @test SmoothPL(3.,1.,-0.5,-1.5,1.,s=1.1) == 3.4226591419723746
     #
     @test BknPow(1.1:0.3:3.3,[2.],[-1.,-2.]) == [0.9090909090909091,0.7142857142857143,0.5882352941176471,0.5,0.5,0.3912721893491123,0.3145065398335315,0.25830078124999994]
+    #
+    mags = [12.,13.]
+    emags = [0.1,0.05]
+    uswift = get_filter("Swift/UVOT.u")
+    ustrip.(Mag2Flux(mags,emags,uswift,"AB")["Flux"]) == [1.43516e-13, 5.71349e-14]
+    #
+    Flux2Mag(Mag2Flux(mags,emags,uswift,"AB")["Flux"],Mag2Flux(mags,emags,uswift,"AB")["eFlux"],uswift,"AB")["Mags"] == mags
     #
 end

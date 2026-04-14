@@ -1,7 +1,7 @@
 name = "FittingFunction"
 uuid = "7c8a6357-aefd-4570-aae0-a8cd991d38f9"
+version = "0.18.0"
 authors = ["Stefano Covino <stefano.covino@inaf.it> and contributors"]
-version = "0.17.0"
 
 [deps]
 AbstractFFTs = "621f4979-c628-5d54-868e-fcf4e3e8185c"
@@ -9,19 +9,23 @@ CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DustExtinction = "fb44c06c-c62f-5397-83f5-69249e0a3c8e"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+PhotometricFilters = "482c37c2-cde1-4201-a412-83b81535d120"
 PhysicalConstants = "5ad8b20f-a522-5ce9-bfc9-ddf1d5bda6ab"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+UnitfulAstro = "6112ee07-acf9-5e0f-b108-d242c714bf9f"
 
 [compat]
 AbstractFFTs = "1"
 CSV = "0.10"
 DataFrames = "1"
-DustExtinction = "0.11"
+DustExtinction = "0.11.6"
 FFTW = "1"
+PhotometricFilters = "1.0.0"
 PhysicalConstants = "0.2"
 StatsBase = "0.34"
 Unitful = "1"
+UnitfulAstro = "1.2.2"
 julia = "1.9"
 
 [extras]

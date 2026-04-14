@@ -5,8 +5,10 @@ using DataFrames
 using DustExtinction
 using FFTW
 using PhysicalConstants.CODATA2018
+using PhotometricFilters
 using StatsBase
 using Unitful
+using UnitfulAstro
 
 
 
@@ -18,11 +20,13 @@ export Counts2Mag
 export Ecm2sA2Jy
 export Extinction
 export FFGals
+export Flux2Mag
 export GaussAbs
 export Gaussian
 export GetAtomicData
 export Jy2Ecm2sA
 export Mag2Counts
+export Mag2Flux
 export NorrisPulse
 export PL
 export Pol2Stokes
@@ -220,7 +224,12 @@ Ecm2sA2Jy([1.2e-15,2e-15,2.5e-15],[5000,5500,6000])
 ```
 """
 function Ecm2sA2Jy(fluden, lambd)
-    return 3e41 .* fluden ./ (3e18 ./ lambd).^2
+    if length(fluden) == 1
+        return ustrip(F_nu(fluden*u"erg/s/cm^2/angstrom",lambd))
+    else
+        return ustrip.([F_nu(x*u"erg/s/cm^2/angstrom",y) for (x,y) in zip(fluden,lambd)])
+    end
+    #return 3e41 .* fluden ./ (3e18 ./ lambd).^2
 end
 
 
@@ -272,6 +281,47 @@ function Extinction(wave,EBV;gal="SMC",Rv=FFGals["SMC"],z=0.)
     return absr
 end
 
+
+
+
+""""
+    Flux2Mag(flux,eflux,filter::PhotometricFilters.AbstractFilter,magsystem::String)
+
+    Convert fluex to magnitudes.
+
+# Arguments
+
+- `flux` is a vector of input fluxes, in `Jy` or ``erg s^{-1} cm^{-2} Angstrom^{-1}``.
+- `flux` is a vector of input flux uncertainties.
+- `filter` is any filter offeerd by [PhotometricFilters.jl](https://github.com/JuliaAstro/PhotometricFilters.jl.git).
+- `magsystem` is either "AB" or "Vega".
+
+
+# Examples
+```julia
+
+uswift = get_filter("Swift/UVOT.u")
+
+Flux2Mag(fluxvec,efluxvec,uswift,"AB")
+
+It returns a dictionary with two keys: "Mags" and "eMags", with magnitudes and their uncertainties.
+
+"""
+function Flux2Mag(flux,eflux,filter::PhotometricFilters.AbstractFilter,magsystem::String)
+	if uppercase(magsystem) == "AB"
+		msys = AB()
+	else
+		msys = Vega()
+	end
+	if all(x -> unit(x) == u"Jy", flux) && all(x -> unit(x) == u"Jy", eflux)
+		ferg = [F_lambda(x,filter) for x in flux]
+		eferg = [F_lambda(x,filter) for x in eflux]
+		res = Counts2Mag(ustrip.(ferg),ustrip.(eferg),zp=-zeropoint_mag(filter,msys))
+	else
+		res = Counts2Mag(ustrip.(flux),ustrip.(eflux),zp=-zeropoint_mag(filter,msys))
+	end
+	return Dict([("Mags", res[1]), ("eMags", res[2])])
+end
 
 
 
@@ -406,7 +456,12 @@ Jy2Ecm2sA([1e-3,2e-3,3e-3],[5000,5500,6000])
 ```
 """
 function Jy2Ecm2sA(fluden, lambd)
-    return fluden .* 3e-5 ./ lambd.^2
+    if length(fluden) == 1
+        return ustrip(F_lambda(fluden*u"Jy",lambd))
+    else
+        return ustrip.([F_lambda(x*u"Jy",y) for (x,y) in zip(fluden,lambd)])
+    end
+#    return fluden .* 3e-5 ./ lambd.^2
 end
 
 
@@ -442,6 +497,47 @@ function Mag2Counts(mag, emag; zp=25.0)
     ects = (emag .* cts) ./ (2.5 ./ log(10.0))
     return cts, ects
 end
+
+
+""""
+    Mag2Flux(mags,emags,filter::PhotometricFilters.AbstractFilter,magsystem::String)
+
+    Convert magnitudes to flux.
+
+# Arguments
+
+- `mags` is a vector of input magnitudes.
+- `emags` is a vector with magnitude uncertainty.
+- `filter` is any filter offeerd by [PhotometricFilters.jl](https://github.com/JuliaAstro/PhotometricFilters.jl.git).
+- `magsystem` is either "AB" or "Vega".
+
+
+# Examples
+```julia
+
+uswift = get_filter("Swift/UVOT.u")
+
+Mag2Flux(magsvec,emagvec,uswift,"AB")
+
+It returns a dictionary with four keys: `JyFlux`, `JyeFlux`, `Flux` and `eFlux`, reporting
+fluxes and uncertainties in Jy and ``erg s^{-1} cm^{-2} Angstrom^{-1}``, respectively.
+"""
+function Mag2Flux(mags,emags,filter::PhotometricFilters.AbstractFilter,magsystem::String)
+	if uppercase(magsystem) == "AB"
+		msys = AB()
+	else
+		msys = Vega()
+	end
+	res = Mag2Counts(mags,emags,zp=-zeropoint_mag(filter,msys))
+	jyflux = [F_nu(i*u"erg"/u"cm"^2/u"s"/u"angstrom",filter) for i in res[1]]
+	jyeflux = [F_nu(i*u"erg"/u"cm"^2/u"s"/u"angstrom",filter) for i in res[2]]
+	egaflux = res[1].*u"erg"./u"cm"^2 ./u"s"./u"angstrom"
+	egaeflux = res[2].*u"erg"./u"cm"^2 ./u"s"./u"angstrom"
+return Dict([("JyFlux", jyflux), ("JyeFlux", jyeflux), ("Flux", egaflux), ("eFlux", egaeflux)])
+end
+
+
+
 
 
 
