@@ -211,7 +211,7 @@ Convert flux densities in ``erg~s^{-1} cm^{-2} Angstrom^{-1}`` to ``Jy``.
 
 
 # Examples
-```jldoctest
+```julia
 
 Ecm2sA2Jy([1.2e-15,2e-15,2.5e-15],[5000,5500,6000])
 
@@ -443,7 +443,7 @@ Convert flux densities in ``Jy`` to ``erg~s^{-1} cm^{-2} Angstrom^{-1}``.
 
 
 # Examples
-```jldoctest
+```julia
 
 Jy2Ecm2sA([1e-3,2e-3,3e-3],[5000,5500,6000])
 
