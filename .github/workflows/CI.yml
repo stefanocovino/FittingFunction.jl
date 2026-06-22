@@ -23,10 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.11'
-          - '1.10'
-        os:
-          - ubuntu-latest
+          - '1.12'
         arch:
           - x64
     steps:
