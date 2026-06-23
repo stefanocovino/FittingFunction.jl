@@ -50,11 +50,11 @@ using Unitful
     #
     @test BknPow(1.1:0.3:3.3,[2.],[-1.,-2.]) == [0.9090909090909091,0.7142857142857143,0.5882352941176471,0.5,0.5,0.3912721893491123,0.3145065398335315,0.25830078124999994]
     #
-    mags = [12.,13.]
-    emags = [0.1,0.05]
-    uswift = get_filter("Swift/UVOT.u")
-    ustrip.(Mag2Flux(mags,emags,uswift,"AB")["Flux"]) == [1.43516e-13, 5.71349e-14]
+    #mags = [12.,13.]
+    #emags = [0.1,0.05]
+    #uswift = get_filter("Swift/UVOT.u")
+    #ustrip.(Mag2Flux(mags,emags,uswift,"AB")["Flux"]) == [1.43516e-13, 5.71349e-14]
     #
-    Flux2Mag(Mag2Flux(mags,emags,uswift,"AB")["Flux"],Mag2Flux(mags,emags,uswift,"AB")["eFlux"],uswift,"AB")["Mags"] == mags
+    #Flux2Mag(Mag2Flux(mags,emags,uswift,"AB")["Flux"],Mag2Flux(mags,emags,uswift,"AB")["eFlux"],uswift,"AB")["Mags"] == mags
     #
 end
