@@ -17,7 +17,7 @@ UnitfulAstro = "6112ee07-acf9-5e0f-b108-d242c714bf9f"
 
 [compat]
 AbstractFFTs = "1"
-CSV = "0.10"
+CSV = "0.10, 1"
 DataFrames = "1"
 DustExtinction = "0.11.6"
 FFTW = "1"
